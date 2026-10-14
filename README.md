@@ -58,14 +58,3 @@ git clone --recursive https://github.com/JJrexWang/jmdownloader-docker && cd jmd
 docker build -t jmd:dev . && ./scripts/smoke-test.sh jmd:dev
 ```
 
-## 启用 CI（一次性）
-
-当前 `gh` 登录令牌没有 `workflow` 权限，无法推送 `.github/workflows/`，所以 workflow 暂存在 `ci/docker.yml`。启用方法：
-
-```bash
-gh auth refresh -s workflow
-mkdir -p .github/workflows && git mv ci/docker.yml .github/workflows/docker.yml
-git commit -m "ci: enable docker workflow" && git push
-```
-
-首次推送到 GHCR 后，到 GitHub → Packages → jmdownloader-docker → Package settings 把可见性改成 Public，即可免登录拉取。
