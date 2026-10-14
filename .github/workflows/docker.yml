@@ -8,7 +8,7 @@ on:
   schedule:
     - cron: '0 20 * * 0'   # 每周一 04:00 CST 重建，带上基础镜像安全更新
 env:
-  IMAGE: ghcr.io/${{ github.repository_owner }}/jmdownloader-docker
+  IMAGE: ghcr.io/jjrexwang/jmdownloader-docker
 permissions:
   contents: read
   packages: write
