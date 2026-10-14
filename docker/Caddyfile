@@ -1,0 +1,11 @@
+{
+	admin off
+	auto_https off
+	persist_config off
+}
+:{$LISTEN_PORT} {
+	# /health 不鉴权，方便 Docker healthcheck / 反代探活
+	reverse_proxy 127.0.0.1:{$JM_INTERNAL_PORT} {
+		flush_interval -1
+	}
+}

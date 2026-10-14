@@ -1,0 +1,19 @@
+{
+	admin off
+	auto_https off
+	persist_config off
+}
+:{$LISTEN_PORT} {
+	@health path /health
+	handle @health {
+		reverse_proxy 127.0.0.1:{$JM_INTERNAL_PORT}
+	}
+	handle {
+		basic_auth {
+			{$AUTH_USER} {$AUTH_HASH}
+		}
+		reverse_proxy 127.0.0.1:{$JM_INTERNAL_PORT} {
+			flush_interval -1
+		}
+	}
+}

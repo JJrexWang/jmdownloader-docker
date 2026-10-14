@@ -1,0 +1,7 @@
+.git
+**/.git
+upstream/node_modules
+upstream/src-tauri/target
+config
+downloads
+.env
