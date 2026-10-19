@@ -33,7 +33,7 @@ docker run -d --name jmdownloader -p 1180:8080 \
 |---|---|---|
 | `AUTH_USER` / `AUTH_PASSWORD` | 空 | 都填则开启 Basic Auth（`/health` 除外）。**暴露到公网务必开启** |
 | `JM_USERNAME` / `JM_PASSWORD` | 空 | 启动时自动登录 JM；也可在 WebUI 登录 |
-| `PUID` / `PGID` | 10001 | 容器内运行用户，NAS 上可改成自己的 uid/gid |
+| `PUID` / `PGID` | 空（自动推断，回退 10001） | 容器内运行用户；留空则从下载目录已有文件的属主自动推断，显式设置优先 |
 | `TZ` | Asia/Shanghai（compose） | 时区 |
 | `RUST_LOG` | info | 日志级别 |
 
@@ -42,6 +42,29 @@ docker run -d --name jmdownloader -p 1180:8080 \
 ## 架构
 
 容器内：`tini` → `entrypoint.sh` →（降权到 PUID）`server`（127.0.0.1 内部端口 18080）+ `caddy`（对外 8080，可选 Basic Auth，SSE 不缓冲）。任一进程退出容器即退出，交给 `restart` 策略。HEALTHCHECK 用 `curl /health`。
+
+## 故障排除
+
+### 飞牛OS / NAS：日志大量 `Permission denied (os error 13)`，库存页为空
+
+**新版已自动处理**：`PUID`/`PGID` 留空（默认）时，entrypoint 启动时会从下载目录**已有文件的属主自动推断运行用户**——把下载目录指向飞牛上的已有漫画库，无需手动查 uid，开箱即用；新下载的文件属主就是库文件的主人，在飞牛文件管理里可直接管理。
+
+如果仍报权限错误（例如库内文件属主混杂、或之前用 root 跑过导致部分文件归 root），启动日志开头会有 `ERROR` 并给出指引。手动覆盖（二选一）：
+
+1. `.env` 里显式设置（显式配置优先于自动推断）：
+   ```env
+   PUID=1000
+   PGID=1000
+   ```
+   ```bash
+   ls -n /你的/下载目录 | head -3   # 在飞牛终端/SSH 里执行，看第 3、4 列数字
+   docker compose up -d
+   ```
+
+2. 在 NAS/宿主机上把目录属主统一改掉（会改变宿主机文件属主）：
+   ```bash
+   chown -R 10001:10001 /你的/下载目录
+   ```
 
 ## 更新上游
 

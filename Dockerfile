@@ -34,10 +34,11 @@ COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY docker/Caddyfile docker/Caddyfile.auth /etc/caddy/
 RUN chmod +x /usr/local/bin/entrypoint.sh && mkdir -p /config /downloads
 
+# PUID/PGID 不在这里设默认值：留空时 entrypoint 会从下载目录已有文件的
+# 属主自动推断（docker 去适应 NAS），显式 -e PUID=xxx 可覆盖。
 ENV JM_CONFIG_DIR=/config \
     JM_DOWNLOADS_DIR=/downloads \
     LISTEN_PORT=8080 \
-    PUID=10001 PGID=10001 \
     RUST_LOG=info \
     XDG_DATA_HOME=/tmp XDG_CONFIG_HOME=/tmp
 EXPOSE 8080
