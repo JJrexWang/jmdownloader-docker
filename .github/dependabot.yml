@@ -1,0 +1,12 @@
+# Dependabot：自动跟进 upstream submodule。
+#
+# 背景：上游（jmdownloader-enhance）修了 webui 等内容后，docker 镜像要跟进，
+# 需要把 submodule 指针 bump 到新 commit。Dependabot 会定期检查并自动提 PR，
+# 合并 PR 后会自动触发 docker.yml 重新构建多架构镜像。
+# 想立刻检查一次：仓库页面 → Insights → Dependency graph → Dependabot → Check for updates
+version: 2
+updates:
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "weekly"
