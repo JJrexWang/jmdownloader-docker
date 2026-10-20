@@ -3,7 +3,6 @@
 set -euo pipefail
 log(){ echo "[entrypoint] $*"; }
 
-PUID="${PUID:-10001}"; PGID="${PGID:-10001}"
 CONFIG_DIR="${JM_CONFIG_DIR:-/config}"; DL_DIR="${JM_DOWNLOADS_DIR:-/downloads}"
 export JM_INTERNAL_PORT="${JM_INTERNAL_PORT:-18080}" LISTEN_PORT="${LISTEN_PORT:-8080}"
 mkdir -p "$CONFIG_DIR" "$DL_DIR"
