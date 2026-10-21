@@ -1,9 +1,21 @@
-# 用法：cp .env.example .env && 按需修改 && docker compose up -d
+# ============================================================
+# jmdownloader-docker 标准部署模板
+#
+# 用法：
+#   1. cp .env.example .env   # 按需修改端口、目录、账号
+#   2. docker compose pull && docker compose up -d
+#   3. 浏览器打开 http://<主机IP>:1180
+#
+# 说明：
+#   - 默认从 GHCR 拉取预构建镜像，无需本地构建
+#   - 如需从源码构建：注释掉 image 行，取消 build 行的注释，
+#     先 git submodule update --init，再 docker compose up -d --build
+# ============================================================
+
 services:
   jmdownloader:
     image: ${IMAGE:-ghcr.io/jjrexwang/jmdownloader-docker:latest}
-    # 想本地从源码构建：git submodule update --init 后改用 `docker compose up -d --build`
-    build: .
+    # build: .   # 本地构建时取消注释，同时注释掉上面 image 行
     container_name: jmdownloader
     restart: unless-stopped
     ports:
@@ -12,13 +24,16 @@ services:
       - ${CONFIG_PATH:-./config}:/config
       - ${DOWNLOADS_PATH:-./downloads}:/downloads
     environment:
-      # 留空 = 自动从下载目录已有文件的属主推断运行用户（推荐，docker 自动适应飞牛/NAS）；
-      # 显式设置则优先使用。PGID 留空时默认与 PUID 相同。
+      # 容器内运行用户。留空 = 自动从下载目录已有文件的属主推断
+      #（推荐：docker 自动适应飞牛/NAS，指向已有漫画库时开箱即用）。
+      # 显式设置则优先使用；PGID 留空时默认与 PUID 相同。
       PUID: ${PUID:-}
       PGID: ${PGID:-}
       TZ: ${TZ:-Asia/Shanghai}
       RUST_LOG: ${RUST_LOG:-info}
+      # JM 账号（可留空，之后在 WebUI 里登录；填了则启动时自动登录）
       JM_USERNAME: ${JM_USERNAME:-}
       JM_PASSWORD: ${JM_PASSWORD:-}
+      # WebUI Basic Auth（两项都填才开启；暴露到公网务必开启）
       AUTH_USER: ${AUTH_USER:-}
       AUTH_PASSWORD: ${AUTH_PASSWORD:-}
